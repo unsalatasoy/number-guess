@@ -10,10 +10,11 @@ services:
       - key: PORT
         value: 3001
 
-  - type: static
+  - type: web
     name: number-guess-client
+    env: node
     buildCommand: npm install && npm run build
-    staticPublishPath: ./build
+    startCommand: serve -s build
     envVars:
       - key: REACT_APP_SERVER_URL
         fromService:
