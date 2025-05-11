@@ -37,19 +37,34 @@ function App() {
 
   useEffect(() => {
     const newSocket = io(SOCKET_URL);
+    console.log('Socket connected with ID:', newSocket.id);
     setSocket(newSocket);
 
     newSocket.on('playerCount', (count: number) => {
-      setGameState(prev => ({ ...prev, playerCount: count }));
+      console.log('Player count updated:', count, 'Current socket ID:', newSocket.id);
+      setGameState(prev => {
+        console.log('Previous game state:', prev);
+        return { ...prev, playerCount: count };
+      });
+    });
+
+    newSocket.on('connect', () => {
+      console.log('Socket connected');
+    });
+
+    newSocket.on('disconnect', () => {
+      console.log('Socket disconnected');
     });
 
     newSocket.on('error', (message: string) => {
+      console.log('Socket error:', message);
       setErrorMessage(message);
     });
 
     newSocket.on('numberSet', ({ playerId, playerCount, numbersSet }) => {
-      console.log('Number set event received:', { playerId, playerCount, numbersSet });
+      console.log('Number set event received:', { playerId, playerCount, numbersSet, myId: newSocket.id });
       if (playerId !== newSocket.id) {
+        console.log('Opponent set their number');
         setGameState(prev => ({
           ...prev,
           isGameReady: numbersSet === 2
@@ -106,6 +121,7 @@ function App() {
 
   const joinRoom = (roomId: string) => {
     if (!socket) return;
+    console.log('Joining room:', roomId, 'Socket ID:', socket.id);
     socket.emit('joinRoom', roomId);
     setGameState(prev => ({
       ...prev,
@@ -119,6 +135,7 @@ function App() {
   const setNumber = (number: string) => {
     if (!socket || !gameState.roomId) return;
     if (number.length === 4 && new Set(number).size === 4) {
+      console.log('Setting number:', number, 'in room:', gameState.roomId);
       socket.emit('setNumber', { roomId: gameState.roomId, number });
       setGameState(prev => ({
         ...prev,

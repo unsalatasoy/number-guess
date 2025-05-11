@@ -47,7 +47,9 @@ io.on('connection', (socket) => {
     }
     room.players.push(socket.id);
     socket.join(roomId);
-    io.to(roomId).emit('playerCount', room.players.length);
+    console.log(`Player ${socket.id} joined room ${roomId}. Total players: ${room.players.length}`);
+    // Emit to all players in the room, including the new player
+    io.in(roomId).emit('playerCount', room.players.length);
     socket.emit('yourTurn', false);
   });
 
@@ -55,6 +57,12 @@ io.on('connection', (socket) => {
     const room = rooms.get(roomId);
     if (room) {
       console.log(`Player ${socket.id} set number in room ${roomId}`);
+      console.log('Current room state:', {
+        players: room.players,
+        numbersSet: room.numbers.size,
+        numbers: Array.from(room.numbers.entries())
+      });
+      
       room.numbers.set(socket.id, number);
       
       // Notify all players in the room that a number has been set
@@ -66,6 +74,10 @@ io.on('connection', (socket) => {
       
       if (room.numbers.size === 2) {
         console.log(`Game ready in room ${roomId}`);
+        console.log('Final room state:', {
+          players: room.players,
+          numbers: Array.from(room.numbers.entries())
+        });
         io.to(roomId).emit('gameReady');
         // Set the first turn to the host
         const hostId = room.players[0];
@@ -73,6 +85,8 @@ io.on('connection', (socket) => {
         io.to(hostId).emit('yourTurn', true);
         io.to(room.players[1]).emit('yourTurn', false);
       }
+    } else {
+      console.log(`Room ${roomId} not found when player ${socket.id} tried to set number`);
     }
   });
 
