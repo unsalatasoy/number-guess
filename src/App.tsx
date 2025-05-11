@@ -47,7 +47,18 @@ function App() {
       setErrorMessage(message);
     });
 
+    newSocket.on('numberSet', ({ playerId, playerCount, numbersSet }) => {
+      console.log('Number set event received:', { playerId, playerCount, numbersSet });
+      if (playerId !== newSocket.id) {
+        setGameState(prev => ({
+          ...prev,
+          isGameReady: numbersSet === 2
+        }));
+      }
+    });
+
     newSocket.on('gameReady', () => {
+      console.log('Game ready event received');
       setGameState(prev => ({ ...prev, isGameReady: true }));
     });
 

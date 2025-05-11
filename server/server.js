@@ -54,8 +54,18 @@ io.on('connection', (socket) => {
   socket.on('setNumber', ({ roomId, number }) => {
     const room = rooms.get(roomId);
     if (room) {
+      console.log(`Player ${socket.id} set number in room ${roomId}`);
       room.numbers.set(socket.id, number);
+      
+      // Notify all players in the room that a number has been set
+      io.to(roomId).emit('numberSet', { 
+        playerId: socket.id,
+        playerCount: room.players.length,
+        numbersSet: room.numbers.size
+      });
+      
       if (room.numbers.size === 2) {
+        console.log(`Game ready in room ${roomId}`);
         io.to(roomId).emit('gameReady');
         // Set the first turn to the host
         const hostId = room.players[0];
