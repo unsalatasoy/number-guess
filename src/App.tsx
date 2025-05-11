@@ -65,16 +65,24 @@ function App() {
       console.log('Number set event received:', { playerId, playerCount, numbersSet, myId: newSocket.id });
       if (playerId !== newSocket.id) {
         console.log('Opponent set their number');
-        setGameState(prev => ({
-          ...prev,
-          isGameReady: numbersSet === 2
-        }));
+        setGameState(prev => {
+          const newState = {
+            ...prev,
+            isGameReady: numbersSet === 2
+          };
+          console.log('Updated game state after numberSet:', newState);
+          return newState;
+        });
       }
     });
 
     newSocket.on('gameReady', () => {
       console.log('Game ready event received');
-      setGameState(prev => ({ ...prev, isGameReady: true }));
+      setGameState(prev => {
+        const newState = { ...prev, isGameReady: true };
+        console.log('Updated game state after gameReady:', newState);
+        return newState;
+      });
     });
 
     newSocket.on('guessResult', ({ guess, result }) => {
@@ -137,10 +145,14 @@ function App() {
     if (number.length === 4 && new Set(number).size === 4) {
       console.log('Setting number:', number, 'in room:', gameState.roomId);
       socket.emit('setNumber', { roomId: gameState.roomId, number });
-      setGameState(prev => ({
-        ...prev,
-        playerNumber: number
-      }));
+      setGameState(prev => {
+        const newState = {
+          ...prev,
+          playerNumber: number
+        };
+        console.log('Updated game state after setNumber:', newState);
+        return newState;
+      });
     }
   };
 
@@ -153,6 +165,7 @@ function App() {
   };
 
   const renderGameStatus = () => {
+    console.log('Rendering game status with state:', gameState);
     if (gameState.gameOver) {
       return (
         <div className="bg-green-500/10 text-green-500 p-4 rounded-lg text-2xl font-bold my-5">
