@@ -14,9 +14,7 @@ interface GameState {
   winner: string | null;
 }
 
-const SOCKET_URL = process.env.NODE_ENV === 'production' 
-  ? 'https://your-server-url.com'  // Replace this with your actual server URL
-  : 'http://localhost:3001';
+const SOCKET_URL = process.env.REACT_APP_SERVER_URL || 'http://localhost:3001';
 
 function App() {
   const [socket, setSocket] = useState<Socket | null>(null);

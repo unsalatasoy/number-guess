@@ -1,0 +1,22 @@
+services:
+  - type: web
+    name: number-guess-server
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3001
+
+  - type: static
+    name: number-guess-client
+    buildCommand: npm install && npm run build
+    staticPublishPath: ./build
+    envVars:
+      - key: REACT_APP_SERVER_URL
+        fromService:
+          type: web
+          name: number-guess-server
+          envVarKey: RENDER_EXTERNAL_URL 
