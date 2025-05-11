@@ -10,7 +10,7 @@ const server = http.createServer(app);
 const io = new Server(server, {
   cors: {
     origin: process.env.NODE_ENV === 'production' 
-      ? ['https://number-guess-client.onrender.com', 'http://localhost:3000']
+      ? ['https://number-guess-db83.onrender.com', 'http://localhost:3000']
       : "http://localhost:3000",
     methods: ["GET", "POST"]
   }
